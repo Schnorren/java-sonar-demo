@@ -1,5 +1,6 @@
 package com.demo.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @DisplayName("JwtService Tests")
 class JwtServiceTest {
@@ -33,7 +35,7 @@ class JwtServiceTest {
         String token = jwtService.generateToken(userDetails);
 
         assertThat(token).isNotBlank();
-        assertThat(token.split("\\.")).hasSize(3); // header.payload.signature
+        assertThat(token.split("\\.")).hasSize(3);
     }
 
     @Test
@@ -68,13 +70,14 @@ class JwtServiceTest {
     }
 
     @Test
-    @DisplayName("Should reject expired token")
+    @DisplayName("Should throw ExpiredJwtException for expired token")
     void isTokenValid_expired() {
-        ReflectionTestUtils.setField(jwtService, "jwtExpirationMs", -1000L); // already expired
-        String token = jwtService.generateToken(userDetails);
+        // Gera token já expirado (-1000ms no passado)
+        ReflectionTestUtils.setField(jwtService, "jwtExpirationMs", -1000L);
+        String expiredToken = jwtService.generateToken(userDetails);
 
-        boolean valid = jwtService.isTokenValid(token, userDetails);
-
-        assertThat(valid).isFalse();
+        // JJWT lança ExpiredJwtException ao tentar fazer parse de token expirado
+        assertThatThrownBy(() -> jwtService.isTokenValid(expiredToken, userDetails))
+                .isInstanceOf(ExpiredJwtException.class);
     }
 }
