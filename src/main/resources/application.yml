@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: java-sonar-demo
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+app:
+  jwt:
+    # IMPORTANT: Override this in production via environment variable APP_JWT_SECRET
+    # Must be at least 256 bits (32 characters) for HS256
+    secret: ${APP_JWT_SECRET:change-me-in-production-use-at-least-32-chars!!}
+    expiration-ms: 86400000  # 24 hours
+
+server:
+  port: 8080
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+
+logging:
+  level:
+    com.demo: INFO
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
