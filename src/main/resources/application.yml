@@ -29,7 +29,7 @@ app:
     expiration-ms: 86400000  # 24 hours
 
 server:
-  port: 8080
+  port: 8070
   error:
     include-message: never
     include-stacktrace: never
